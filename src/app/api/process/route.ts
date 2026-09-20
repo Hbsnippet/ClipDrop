@@ -1,11 +1,12 @@
+import { getInstagramReel } from "@/lib/instagram";
+import { getXPost } from "@/lib/x";
+
 export async function POST(request: Request) {
     const { url } = await request.json();
     console.log(url);
 
     try {
         const allowed = [
-            "youtube.com",
-            "tiktok.com",
             "instagram.com",
             "x.com",
             "twitter.com",
@@ -26,6 +27,22 @@ export async function POST(request: Request) {
         const host = parsedUrl.hostname.replace(/^www\./, "");
         console.log(host);
 
+        let platform: "Instagram" | "X" | undefined;
+
+        if (host === "instagram.com" || host.endsWith(".instagram.com")) {
+            platform = "Instagram";
+        } else if (
+            host === "x.com" ||
+            host === "twitter.com" ||
+            host.endsWith(".x.com") ||
+            host.endsWith(".twitter.com")
+        ) {
+            platform = "X";
+        }
+
+
+
+
         const isSupported = allowed.some(
             (site) => host === site || host.endsWith("." + site)
         );
@@ -37,10 +54,19 @@ export async function POST(request: Request) {
             );
         }
 
+        const sourceUrl = parsedUrl.toString();
+        const media =
+            platform === "Instagram"
+                ? await getInstagramReel(sourceUrl)
+                : await getXPost(sourceUrl);
+
         return Response.json({
-            message: "API is working",
-            url: parsedUrl.toString(),
+            platform,
+            sourceUrl,
+            media,
         });
+
+
 
     } catch (error) {
         return Response.json(
@@ -48,4 +74,6 @@ export async function POST(request: Request) {
             { status: 400 }
         );
     }
+
+    
 }

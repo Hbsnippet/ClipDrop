@@ -11,11 +11,9 @@ export default function Home() {
 
 
     const allowed = [
-        "youtube.com",
-        "tiktok.com",
         "instagram.com",
         "x.com",
-        "twitter.com",   
+        "twitter.com",
     ]
 
 
@@ -59,7 +57,7 @@ export default function Home() {
         const isSupported = allowed.some ((site) => host === site || host.endsWith("." + site))
 
         if(!isSupported){
-            setResult("Only youtube, X, Tiktok, and Instagram are supported")
+            setResult("Only Instagram and X links are supported")
             return;
         }
 
@@ -74,7 +72,7 @@ export default function Home() {
             });
 
             console.log(response.data)
-            setResult(response.data.url);
+            setResult(response.data.platform);
         } catch (error) {
             setResult("Something went wrong")
         } finally {
@@ -89,7 +87,7 @@ export default function Home() {
         <main>
             <div>
             <h1>Clipdrop</h1>
-            <p>Clipdrop is a platform for downloading videos from instagram, tiktok, youtube, etc.</p>
+            <p>Clipdrop is a platform for downloading videos from Instagram and X.</p>
             </div>
 
             <form onSubmit={handleSubmit}>
