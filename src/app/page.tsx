@@ -63,8 +63,6 @@ export default function Home() {
 
         const allowed = [
             "instagram.com",
-            "x.com",
-            "twitter.com",
         ];
 
         const isSupported = allowed.some(
@@ -74,7 +72,7 @@ export default function Home() {
         );
 
         if (!isSupported) {
-            setError("Only Instagram and X are supported");
+            setError("Only Instagram is supported");
             return;
         }
 

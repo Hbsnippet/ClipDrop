@@ -4,7 +4,7 @@ export function InfoSection() {
             <div className="rounded-3xl border border-[#e7e0d8] bg-white px-6 py-8 shadow-sm sm:px-10 sm:py-10">
                 <h2 id="how" className="text-xl font-semibold tracking-tight">How ClipDrop works</h2>
                 <ol className="mt-4 space-y-2 text-sm leading-relaxed text-[#5f5852] sm:text-base">
-                    <li>1. Copy a public Instagram or X link</li>
+                    <li>1. Copy a public Instagram reel link</li>
                     <li>2. Paste it into ClipDrop</li>
                     <li>3. Click Download</li>
                     <li>4. Preview or download the media</li>

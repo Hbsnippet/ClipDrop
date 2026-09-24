@@ -10,10 +10,10 @@ export function Hero({ url, loading, error, onUrlChange, onSubmit }: HeroProps) 
     return (
         <>
             <p className="rounded-full border border-[#e4ddd4] bg-white px-3 py-1 text-xs font-medium text-[#6d6560]">
-                Instagram & X Downloader
+                Instagram Reel Downloader
             </p>
             <h1 className="mt-6 max-w-2xl text-4xl font-semibold tracking-tight text-[#1c1917] sm:text-5xl sm:leading-tight">
-                Download Instagram Reels & X Videos
+                Download Instagram Reels
             </h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-[#6d6560] sm:text-lg">
                 Paste a public media link and download it in seconds. Simple, fast, and no login required.
@@ -35,7 +35,7 @@ export function Hero({ url, loading, error, onUrlChange, onSubmit }: HeroProps) 
                         type="text"
                         value={url}
                         autoComplete="off"
-                        placeholder="Paste your Instagram or X link..."
+                        placeholder="Paste your Instagram reel link..."
                         onChange={(e) => onUrlChange(e.target.value)}
                         className="w-full bg-transparent text-left text-sm text-[#1c1917] outline-none placeholder:text-[#a39b94] focus:outline-none"
                     />

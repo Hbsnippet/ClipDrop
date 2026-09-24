@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "ClipDrop",
-  description: "Download public Instagram Reels and X videos.",
+  description: "Download public Instagram Reels.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
