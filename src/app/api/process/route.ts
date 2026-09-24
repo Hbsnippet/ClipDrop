@@ -1,4 +1,4 @@
-import { getInstagramReel } from "@/lib/instagram";
+import { getInstagramReel } from "@/lib/instagramjerry";
 import { getXPost } from "@/lib/x";
 
 export async function POST(request: Request) {
@@ -54,21 +54,22 @@ export async function POST(request: Request) {
             );
         }
 
-        const sourceUrl = parsedUrl.toString();
+        const sourceUrl = `${parsedUrl.origin}${parsedUrl.pathname}`;
         const media =
             platform === "Instagram"
                 ? await getInstagramReel(sourceUrl)
                 : await getXPost(sourceUrl);
 
-        return Response.json({
-            platform,
-            sourceUrl,
-            media,
-        });
+        fetch('http://127.0.0.1:7859/ingest/ee67c554-8dac-4fe9-8c33-cd51ba86f2d9',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'42103d'},body:JSON.stringify({sessionId:'42103d',runId:'pre-fix',hypothesisId:'E',location:'src/app/api/process/route.ts:success',message:'process returning media',data:{platform,mediaKeys:media&&typeof media==='object'?Object.keys(media):[],hasItem:Boolean((media as {item?:unknown}).item),itemIsArray:Array.isArray((media as {item?:unknown}).item)},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+        return Response.json(media);
 
 
 
     } catch (error) {
+        // #region agent log
+        fetch('http://127.0.0.1:7859/ingest/ee67c554-8dac-4fe9-8c33-cd51ba86f2d9',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'42103d'},body:JSON.stringify({sessionId:'42103d',runId:'pre-fix',hypothesisId:'A',location:'src/app/api/process/route.ts:catch',message:'process caught error',data:{errorName:error instanceof Error?error.name:'unknown',errorMessage:error instanceof Error?error.message:String(error),errorStack:error instanceof Error?error.stack?.slice(0,500):undefined},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         return Response.json(
             { message: "Invalid URL" },
             { status: 400 }

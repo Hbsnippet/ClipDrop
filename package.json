@@ -9,7 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@jerrycoder/instagram-api": "^2.5.9",
     "axios": "^1.20.0",
+    "btch-downloader": "^6.4.0",
     "next": "16.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8"

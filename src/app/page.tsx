@@ -1,102 +1,147 @@
 "use client";
 
-import { useState } from "react";
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Hero } from "@/components/hero";
+import { InfoSection } from "@/components/info-section";
+import { Navbar } from "@/components/navbar";
+import { ResultCard, type Result } from "@/components/result-card";
+import { SiteFooter } from "@/components/site-footer";
 
+const isValidHttpUrl = (value: string) => {
+    try {
+        const parsedUrl = new URL(value);
+
+        return (
+            parsedUrl.protocol === "http:" ||
+            parsedUrl.protocol === "https:"
+        );
+    } catch {
+        return false;
+    }
+};
 
 export default function Home() {
     const [url, setUrl] = useState("");
     const [loading, setLoading] = useState(false);
-    const [result , setResult] = useState("");
+    const [result, setResult] = useState<Result | null>(null);
+    const [error, setError] = useState("");
 
+    useEffect(() => {
+        setUrl("");
+    }, []);
 
-    const allowed = [
-        "instagram.com",
-        "x.com",
-        "twitter.com",
-    ]
-
-
-    const isValidHttpUrl = (string : string) => {
-        try {
-
-        const newUrl = new URL(string);
-        return newUrl.protocol === 'https:' || newUrl.protocol === 'http:'
-            
-        } catch {
-            return false;
-        }
-
-    }
-
-
-    
-
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log("testing");
-
-        if (!url) {
-            setResult("Please enter an URL to download");
-            return;
-        }
-
-        if (!isValidHttpUrl(url.trim())) {
-            console.log("Invalid URL")
-            setResult("Please enter a valid URL");
-            return;
-        }
-
-        console.log("URL is valid");
-
-        const parsed = new URL(url.trim());
-        const host = parsed.hostname.replace(/^www\./, "");
-        console.log(host);
-
-        const isSupported = allowed.some ((site) => host === site || host.endsWith("." + site))
-
-        if(!isSupported){
-            setResult("Only Instagram and X links are supported")
-            return;
-        }
-
-        setLoading(true)
-        setResult("")
-
-
-
-        try {
-            const response = await axios.post("/api/process", {
-            url: url
-            });
-
-            console.log(response.data)
-            setResult(response.data.platform);
-        } catch (error) {
-            setResult("Something went wrong")
-        } finally {
-            setLoading(false)
-        }
-
-        
+    const handleDownloadAnother = () => {
+        setUrl("");
+        setResult(null);
+        setError("");
+        setLoading(false);
     };
 
+    const handleSubmit = async (
+        e: React.FormEvent<HTMLFormElement>
+    ) => {
+        e.preventDefault();
+
+        setError("");
+        setResult(null);
+
+        const trimmedUrl = url.trim();
+
+        if (!trimmedUrl) {
+            setError("Please enter a URL");
+            return;
+        }
+
+        if (!isValidHttpUrl(trimmedUrl)) {
+            setError("Please enter a valid URL");
+            return;
+        }
+
+        const parsedUrl = new URL(trimmedUrl);
+        const host = parsedUrl.hostname.replace(/^www\./, "");
+
+        const allowed = [
+            "instagram.com",
+            "x.com",
+            "twitter.com",
+        ];
+
+        const isSupported = allowed.some(
+            (site) =>
+                host === site ||
+                host.endsWith("." + site)
+        );
+
+        if (!isSupported) {
+            setError("Only Instagram and X are supported");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const start = performance.now();
+
+            const response = await axios.post("/api/process", {
+                url: trimmedUrl,
+            });
+
+            console.log(
+                "TOTAL API:",
+                Math.round(performance.now() - start),
+                "ms"
+            );
+
+            console.log("API RESPONSE:", response.data);
+
+            const payload = response.data;
+            const item = payload?.item;
+            const picked = Array.isArray(item) ? item[0] : item;
+            // #region agent log
+            fetch('http://127.0.0.1:7859/ingest/ee67c554-8dac-4fe9-8c33-cd51ba86f2d9',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'42103d'},body:JSON.stringify({sessionId:'42103d',runId:'pre-fix',hypothesisId:'A',location:'src/app/page.tsx:setResult',message:'preview payload shape',data:{topKeys:payload&&typeof payload==='object'?Object.keys(payload):[],itemType:item===null?'null':Array.isArray(item)?'array':typeof item,item0Type:Array.isArray(item)?typeof item[0]:'n/a',pickedType:picked===null?'null':typeof picked,pickedKeys:picked&&typeof picked==='object'?Object.keys(picked):[],hasUrl:Boolean(picked&&typeof picked==='object'&&'url' in picked&&picked.url),hasThumbnail:Boolean(picked&&typeof picked==='object'&&'thumbnail' in picked&&picked.thumbnail),index0Defined:Array.isArray(item)?item[0]!==undefined:false},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
+            // Jerry → route.ts → media → item → [0]
+            setResult(response.data.item);
+            setError("");
+        } catch (err) {
+            console.error("PROCESS ERROR:", err);
+
+            setError("Something went wrong");
+            setResult(null);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
-        <main>
-            <div>
-            <h1>Clipdrop</h1>
-            <p>Clipdrop is a platform for downloading videos from Instagram and X.</p>
-            </div>
+        <main className="min-h-full bg-[#f6f1ea] text-[#1c1917]">
+            <Navbar />
 
-            <form onSubmit={handleSubmit}>
-            <input type="text" value={url} placeholder="Enter a video URL" onChange={(e) => setUrl(e.target.value)} className="border-2 border-gray-300 rounded-md p-2" />
-            <button >{loading ? "processing.." : "Download"}</button>
-            </form>
+            <section id="top" className="mx-auto flex w-full max-w-3xl flex-col items-center px-5 pb-16 pt-14 text-center sm:px-8 sm:pt-20">
+                <Hero
+                    url={url}
+                    loading={loading}
+                    error={error}
+                    onUrlChange={setUrl}
+                    onSubmit={handleSubmit}
+                />
+                {result && (
+                    <ResultCard
+                        result={result}
+                        onDownloadAnother={handleDownloadAnother}
+                    />
+                )}
+                <ul className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-[#7a736c] sm:text-sm">
+                    <li>✓ No login required</li>
+                    <li>✓ Public links only</li>
+                    <li>✓ Original media quality</li>
+                    <li>✓ Simple & fast</li>
+                </ul>
+            </section>
 
-            <p>{result}</p>
-           
+            <InfoSection />
+            <SiteFooter />
         </main>
-    )
+    );
 }
