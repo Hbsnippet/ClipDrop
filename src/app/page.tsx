@@ -130,12 +130,6 @@ export default function Home() {
                         onDownloadAnother={handleDownloadAnother}
                     />
                 )}
-                <ul className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-[#7a736c] sm:text-sm">
-                    <li>✓ No login required</li>
-                    <li>✓ Public links only</li>
-                    <li>✓ Original media quality</li>
-                    <li>✓ Simple & fast</li>
-                </ul>
             </section>
 
             <InfoSection />
